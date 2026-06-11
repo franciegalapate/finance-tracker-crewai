@@ -1,0 +1,23 @@
+[project]
+name = "finance_tracker"
+version = "0.1.0"
+description = "finance-tracker using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "crewai[tools]>=0.120.0,<1.0.0"
+]
+
+[project.scripts]
+finance_tracker = "finance_tracker.main:run"
+run_crew = "finance_tracker.main:run"
+train = "finance_tracker.main:train"
+replay = "finance_tracker.main:replay"
+test = "finance_tracker.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
