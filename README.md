@@ -1,54 +1,93 @@
 # FinanceTracker Crew
 
-Welcome to the FinanceTracker Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+A multi-agent AI system that analyzes your personal finances from a CSV file — fully local, free, and private. Built with [crewAI](https://crewai.com) and powered by [Ollama](https://ollama.com) (no OpenAI account or API key needed).
+
+## What It Does
+
+Four AI agents work in sequence to process your bank transactions:
+
+| Agent                       | Role                                                             |
+| --------------------------- | ---------------------------------------------------------------- |
+| **Transaction Categorizer** | Labels each transaction (Food, Rent, Transport, etc.)            |
+| **Financial Analyst**       | Calculates totals, flags large expenses, spots recurring charges |
+| **Report Writer**           | Produces a readable summary with spending breakdown              |
+| **Finance Advisor**         | Gives personalized tips to improve your spending habits          |
+
+The final report is saved to `finance_report.md` in your project root.
+
+## Requirements
+
+- Python 3.10–3.12
+- [Ollama](https://ollama.com) installed and running locally
 
 ## Installation
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
-
-First, if you haven't already, install uv:
+**1. Install uv** (if you haven't already):
 
 ```bash
 pip install uv
 ```
 
-Next, navigate to your project directory and install the dependencies:
+**2. Install Ollama** from [ollama.com](https://ollama.com), then pull a model:
 
-(Optional) Lock the dependencies and install them by using the CLI command:
+```bash
+ollama pull llama3.1
+```
+
+**3. Install project dependencies:**
+
 ```bash
 crewai install
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+**4. Configure your `.env` file** in the project root:
 
-- Modify `src/finance_tracker/config/agents.yaml` to define your agents
-- Modify `src/finance_tracker/config/tasks.yaml` to define your tasks
-- Modify `src/finance_tracker/crew.py` to add your own logic, tools and specific args
-- Modify `src/finance_tracker/main.py` to add custom inputs for your agents and tasks
+```
+MODEL=ollama/llama3.1:latest
+API_BASE=http://localhost:11434
+```
+
+> Run `ollama list` to confirm the exact model name to use.
 
 ## Running the Project
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+**1. Make sure Ollama is running** (in a separate terminal if needed):
 
 ```bash
-$ crewai run
+ollama serve
 ```
 
-This command initializes the finance-tracker Crew, assembling the agents and assigning them tasks as defined in your configuration.
+**2. Add your CSV file** to the project root. It should have columns like:
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```
+Date, Description, Amount, Type
+```
 
-## Understanding Your Crew
+**3. Set your CSV filename** in `src/finance_tracker/main.py`:
 
-The finance-tracker Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+```python
+csv_path = "your_transactions.csv"
+```
 
-## Support
+**4. Run the crew:**
 
-For support, questions, or feedback regarding the FinanceTracker Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+```bash
+crewai run
+```
 
-Let's create wonders together with the power and simplicity of crewAI.
+The agents will work through your transactions one by one. When finished, your report is saved to `finance_report.md`.
+
+## Project Structure
+
+```
+finance_tracker/
+├── .env                          # Ollama model config
+├── sample_transactions.csv       # Test data
+├── finance_report.md             # Generated report (after running)
+└── src/finance_tracker/
+    ├── main.py                   # Entry point — set your CSV path here
+    ├── crew.py                   # Wires agents and tasks together
+    └── config/
+        ├── agents.yaml           # Agent roles, goals, and backstories
+        └── tasks.yaml            # Task instructions and expected outputs
+```
