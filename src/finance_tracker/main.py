@@ -1,68 +1,39 @@
 #!/usr/bin/env python
 import sys
+import os
 import warnings
-
-from datetime import datetime
-
 from finance_tracker.crew import FinanceTracker
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
+
+def load_csv(filepath: str) -> str:
+    """Read CSV file and return its content as a string."""
+    if not os.path.exists(filepath):
+        print(f"❌ File not found: {filepath}")
+        sys.exit(1)
+    with open(filepath, "r") as f:
+        return f.read()
+
 
 def run():
-    """
-    Run the crew.
-    """
+    csv_path = "sample_transactions.csv"
+
+    print(f"\n📂 Loading transactions from: {csv_path}")
+    csv_content = load_csv(csv_path)
+    print(f"✅ Loaded {len(csv_content.splitlines())} lines\n")
+
     inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
+        "csv_content": csv_content,
+        "large_expense_threshold": "500",  # flag transactions above this amount
     }
-    
+
     try:
         FinanceTracker().crew().kickoff(inputs=inputs)
+        print("\n✅ Done! Report saved to finance_report.md")
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
-    }
-    try:
-        FinanceTracker().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
-
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        FinanceTracker().crew().replay(task_id=sys.argv[1])
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
-
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
-    }
-    
-    try:
-        FinanceTracker().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
+if __name__ == "__main__":
+    run()
