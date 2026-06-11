@@ -1,17 +1,61 @@
-research_task:
+categorize_task:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Here are raw financial transactions from a CSV file:
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    {csv_content}
+
+    Go through EACH transaction line by line. Assign a spending category
+    to each one. Valid categories: Food, Rent, Transport, Entertainment,
+    Health, Shopping, Utilities, Income, Other.
+    Return a clean formatted list: Date | Description | Amount | Category
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A formatted list of all transactions, each with an assigned category.
+    Example format:
+    2024-01-03 | Netflix | -15.99 | Entertainment
+    2024-01-04 | Jollibee | -320.50 | Food
+  agent: transaction_categorizer
+
+analyze_task:
+  description: >
+    Using the categorized transactions from the previous task:
+    1. Calculate total amount spent per category.
+    2. Calculate overall total spending and total income (if any).
+    3. Identify the top 3 highest spending categories.
+    4. Flag any single transactions over {large_expense_threshold} as large expenses.
+    5. Note any recurring charges (same merchant appears 2 or more times).
+  expected_output: >
+    A structured analysis with: totals per category, overall totals,
+    top 3 categories, flagged large expenses, and recurring charges.
+  agent: financial_analyzer
+  context:
+    - categorize_task
+
+report_task:
+  description: >
+    Using the financial analysis, write a detailed personal finance report
+    with these sections:
+    1. Summary (total income vs total spending, net balance)
+    2. Spending Breakdown (each category with amount and % of total)
+    3. Notable Transactions (large expenses and recurring charges)
+    4. Key Observations (2-3 meaningful insights)
+    Make it friendly and readable, not just raw numbers.
+  expected_output: >
+    A well-structured financial report in plain text with all 4 sections
+    clearly labeled and filled in.
+  agent: report_writer
+  context:
+    - analyze_task
+
+advise_task:
+  description: >
+    Based on the financial report, provide 4-5 specific and practical
+    spending improvement suggestions for this person.
+    Be concrete — don't just say "spend less", say WHERE and HOW.
+    Base your advice on their actual spending patterns.
+    End with one short motivational sentence.
+  expected_output: >
+    A numbered list of 4-5 actionable personal finance tips tailored
+    to this person's spending data, plus a closing motivational sentence.
+  agent: finance_advisor
+  context:
+    - report_task
